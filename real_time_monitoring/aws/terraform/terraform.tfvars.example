@@ -1,0 +1,13 @@
+# MongoDB Configuration
+# Copy this file to terraform.tfvars and update with your actual values
+
+# MongoDB Atlas connection string
+# Example: "mongodb+srv://username:password@cluster.mongodb.net/"
+mongodb_uri = ""
+
+# MongoDB database name (default: cspm_findings)
+mongodb_database = "cspm_findings"
+
+# MongoDB collection names
+mongodb_collection_kms = "kms_security_findings"
+mongodb_collection_s3 = "s3_security_findings"

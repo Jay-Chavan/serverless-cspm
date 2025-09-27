@@ -1,0 +1,158 @@
+# CSPM Project - Central GitIgnore File
+
+# Python Virtual Environment
+cspm/
+
+# Node.js and Frontend (from dashboard)
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+# SSH Keys and Sensitive Files
+*.pem
+*.key
+*.pub
+key_pair/
+
+# AWS and Cloud Credentials
+.aws/
+*.pem
+config/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Specific Files and Directories
+test.py
+cloud_c2.py
+serverless_setup_scripts/
+se/
+
+# Terraform Module Specific Ignores
+real_time_monitoring/aws/terraform/modules/*/terraform.tfstate
+real_time_monitoring/aws/terraform/modules/*/terraform.tfstate.backup
+real_time_monitoring/aws/terraform/modules/*/.terraform/
+real_time_monitoring/aws/terraform/modules/*/.terraform.lock.hcl
+
+# Specific Terraform Module Files
+real_time_monitoring/aws/terraform/modules/ec2-opa/key_pair/opa_server_key.pub
+real_time_monitoring/aws/terraform/modules/ec2-opa/.terraform/
+real_time_monitoring/aws/terraform/modules/ec2-opa/.terraform.lock.hcl
+real_time_monitoring/aws/terraform/modules/ec2-opa/terraform.tfstate
+real_time_monitoring/aws/terraform/modules/ec2-opa/terraform.tfstate.backup
+
+real_time_monitoring/aws/terraform/modules/iam/.terraform/
+real_time_monitoring/aws/terraform/modules/iam/terraform.tfstate
+real_time_monitoring/aws/terraform/modules/iam/terraform.tfstate.backup
+
+real_time_monitoring/aws/terraform/modules/lambda/.terraform/
+real_time_monitoring/aws/terraform/modules/lambda/.terraform.lock.hcl
+real_time_monitoring/aws/terraform/modules/lambda/terraform.tfstate
+real_time_monitoring/aws/terraform/modules/lambda/terraform.tfstate.backup
+
+real_time_monitoring/aws/terraform/modules/s3/.terraform/
+real_time_monitoring/aws/terraform/modules/s3/terraform.tfstate
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity

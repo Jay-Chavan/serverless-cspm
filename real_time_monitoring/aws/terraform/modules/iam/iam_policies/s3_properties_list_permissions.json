@@ -1,0 +1,52 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetBucketTagging",
+				"s3:ListCallerAccessGrants",
+				"s3:ListBucketVersions",
+				"s3:GetBucketLogging",
+				"s3:GetAccessGrant",
+				"s3:ListBucket",
+				"s3:GetBucketPolicy",
+				"s3:ListTagsForResource",
+				"s3:GetObjectAcl",
+				"s3:GetEncryptionConfiguration",
+				"s3:ListAccessGrants",
+				"s3:ListAccessGrantsInstances",
+				"s3:GetObjectVersionAcl",
+				"s3:GetAccessGrantsInstance",
+				"s3:GetObjectTagging",
+				"s3:GetBucketOwnershipControls",
+				"s3:GetBucketPublicAccessBlock",
+				"s3:GetBucketPolicyStatus",
+				"s3:ListBucketMultipartUploads",
+				"s3:GetAccessGrantsLocation",
+				"s3:GetObjectRetention",
+				"s3:GetBucketWebsite",
+				"s3:ListAccessPoints",
+				"s3:ListJobs",
+				"s3:GetObjectAttributes",
+				"s3:ListMultiRegionAccessPoints",
+				"s3:GetBucketVersioning",
+				"s3:GetBucketAcl",
+				"s3:GetObjectLegalHold",
+				"s3:GetBucketNotification",
+				"s3:ListAccessGrantsLocations",
+				"s3:GetReplicationConfiguration",
+				"s3:ListMultipartUploadParts",
+				"s3:ListStorageLensConfigurations",
+				"s3:GetObject",
+				"s3:ListAllMyBuckets",
+				"s3:GetBucketCORS",
+				"s3:GetObjectVersionForReplication",
+				"s3:GetBucketLocation",
+				"s3:GetObjectVersion"
+			],
+			"Resource": "*"
+		}
+	]
+}

@@ -1,0 +1,423 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Button,
+  Grid,
+  Divider,
+  Alert,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SecurityIcon from '@mui/icons-material/Security';
+import CloudIcon from '@mui/icons-material/Cloud';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
+import ErrorIcon from '@mui/icons-material/Error';
+import InfoIcon from '@mui/icons-material/Info';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:5000/api';
+
+const FindingDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [finding, setFinding] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
+
+  useEffect(() => {
+    fetchFinding();
+  }, [id]);
+
+  const fetchFinding = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/findings/${id}`);
+      setFinding(response.data);
+      setNewStatus(response.data.status);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch finding details.');
+      console.error('Error fetching finding:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async () => {
+    try {
+      await axios.put(`${API_BASE_URL}/findings/${id}/status`, {
+        status: newStatus,
+      });
+      setFinding({ ...finding, status: newStatus });
+      setStatusDialogOpen(false);
+    } catch (err) {
+      console.error('Error updating status:', err);
+    }
+  };
+
+  const getSeverityColor = (severity) => {
+    switch (severity?.toUpperCase()) {
+      case 'CRITICAL': return 'error';
+      case 'HIGH': return 'warning';
+      case 'MEDIUM': return 'info';
+      case 'LOW': return 'success';
+      default: return 'default';
+    }
+  };
+
+  const getSeverityIcon = (severity) => {
+    switch (severity?.toUpperCase()) {
+      case 'CRITICAL': return <ErrorIcon />;
+      case 'HIGH': return <WarningIcon />;
+      case 'MEDIUM': return <InfoIcon />;
+      case 'LOW': return <CheckCircleIcon />;
+      default: return <InfoIcon />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'open': return 'error';
+      case 'in_progress': return 'warning';
+      case 'resolved': return 'success';
+      case 'false_positive': return 'default';
+      default: return 'default';
+    }
+  };
+
+  const getRecommendations = (finding) => {
+    const recommendations = [];
+    
+    if (finding?.service === 'S3') {
+      if (finding?.title?.includes('public')) {
+        recommendations.push({
+          title: 'Restrict Public Access',
+          description: 'Configure bucket policies to deny public read/write access unless specifically required.',
+          priority: 'High',
+        });
+        recommendations.push({
+          title: 'Enable Access Logging',
+          description: 'Enable S3 access logging to monitor and audit bucket access patterns.',
+          priority: 'Medium',
+        });
+      }
+      if (finding?.title?.includes('encryption')) {
+        recommendations.push({
+          title: 'Enable Server-Side Encryption',
+          description: 'Configure default encryption for the S3 bucket using AES-256 or KMS.',
+          priority: 'High',
+        });
+      }
+    }
+    
+    if (finding?.service === 'EC2') {
+      recommendations.push({
+        title: 'Review Security Groups',
+        description: 'Ensure security groups follow the principle of least privilege.',
+        priority: 'High',
+      });
+      recommendations.push({
+        title: 'Enable VPC Flow Logs',
+        description: 'Enable VPC Flow Logs to monitor network traffic.',
+        priority: 'Medium',
+      });
+    }
+    
+    if (finding?.service === 'IAM') {
+      recommendations.push({
+        title: 'Apply Least Privilege',
+        description: 'Review and reduce permissions to the minimum required.',
+        priority: 'High',
+      });
+      recommendations.push({
+        title: 'Enable MFA',
+        description: 'Require multi-factor authentication for sensitive operations.',
+        priority: 'High',
+      });
+    }
+    
+    // Default recommendations if none specific
+    if (recommendations.length === 0) {
+      recommendations.push({
+        title: 'Review Configuration',
+        description: 'Review the resource configuration against security best practices.',
+        priority: 'Medium',
+      });
+      recommendations.push({
+        title: 'Monitor Changes',
+        description: 'Set up monitoring and alerting for configuration changes.',
+        priority: 'Low',
+      });
+    }
+    
+    return recommendations;
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/')}
+          sx={{ mt: 2 }}
+        >
+          Back to Dashboard
+        </Button>
+      </Box>
+    );
+  }
+
+  if (!finding) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">Finding not found</Alert>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/')}
+          sx={{ mt: 2 }}
+        >
+          Back to Dashboard
+        </Button>
+      </Box>
+    );
+  }
+
+  const recommendations = getRecommendations(finding);
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Header */}
+      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate('/')}
+            variant="outlined"
+          >
+            Back to Dashboard
+          </Button>
+          <Typography variant="h4">
+            Finding Details
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          onClick={() => setStatusDialogOpen(true)}
+        >
+          Update Status
+        </Button>
+      </Box>
+
+      <Grid container spacing={3}>
+        {/* Main Finding Information */}
+        <Grid item xs={12} md={8}>
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                {getSeverityIcon(finding.severity)}
+                <Typography variant="h5" component="h1">
+                  {finding.title}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+                <Chip
+                  label={finding.severity}
+                  color={getSeverityColor(finding.severity)}
+                  variant="outlined"
+                />
+                <Chip
+                  label={finding.status}
+                  color={getStatusColor(finding.status)}
+                />
+                <Chip
+                  label={finding.service}
+                  icon={<CloudIcon />}
+                  variant="outlined"
+                />
+              </Box>
+
+              <Typography variant="body1" paragraph>
+                {finding.description}
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Resource ID
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    {finding.resource_id}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Region
+                  </Typography>
+                  <Typography variant="body2">
+                    {finding.region || 'N/A'}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Account ID
+                  </Typography>
+                  <Typography variant="body2">
+                    {finding.account_id || 'N/A'}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Detected At
+                  </Typography>
+                  <Typography variant="body2">
+                    {new Date(finding.timestamp).toLocaleString()}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              {finding.details && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Additional Details
+                  </Typography>
+                  <Box sx={{ backgroundColor: '#f5f5f5', p: 2, borderRadius: 1 }}>
+                    <pre style={{ margin: 0, fontSize: '0.875rem', whiteSpace: 'pre-wrap' }}>
+                      {JSON.stringify(finding.details, null, 2)}
+                    </pre>
+                  </Box>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Sidebar with Recommendations */}
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AssignmentIcon />
+                Security Recommendations
+              </Typography>
+              
+              <List>
+                {recommendations.map((rec, index) => (
+                  <ListItem key={index} sx={{ px: 0 }}>
+                    <ListItemIcon>
+                      <Chip
+                        label={rec.priority}
+                        size="small"
+                        color={rec.priority === 'High' ? 'error' : rec.priority === 'Medium' ? 'warning' : 'default'}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={rec.title}
+                      secondary={rec.description}
+                      primaryTypographyProps={{ variant: 'subtitle2' }}
+                      secondaryTypographyProps={{ variant: 'body2' }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card sx={{ mt: 2 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Quick Actions
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<SecurityIcon />}
+                  fullWidth
+                >
+                  View in AWS Console
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<ScheduleIcon />}
+                  fullWidth
+                >
+                  Schedule Remediation
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<AssignmentIcon />}
+                  fullWidth
+                >
+                  Generate Report
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Status Update Dialog */}
+      <Dialog open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)}>
+        <DialogTitle>Update Finding Status</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth sx={{ mt: 1 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={newStatus || ''}
+              label="Status"
+              onChange={(e) => setNewStatus(e?.target?.value || '')}
+            >
+              <MenuItem value="open">Open</MenuItem>
+              <MenuItem value="in_progress">In Progress</MenuItem>
+              <MenuItem value="resolved">Resolved</MenuItem>
+              <MenuItem value="false_positive">False Positive</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStatusDialogOpen(false)}>Cancel</Button>
+          <Button onClick={updateStatus} variant="contained">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default FindingDetail;
