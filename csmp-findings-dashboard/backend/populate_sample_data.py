@@ -9,6 +9,10 @@ from datetime import datetime, timedelta
 import random
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # MongoDB connection
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
@@ -269,7 +273,7 @@ if __name__ == "__main__":
     
     success = populate_database()
     if success:
-        print("\n✅ Sample data population completed successfully!")
+        print("\n[SUCCESS] Sample data population completed successfully!")
         print("You can now view the findings in your dashboard at http://localhost:5173/")
     else:
-        print("\n❌ Failed to populate sample data")
+        print("\n[FAILED] Failed to populate sample data")
