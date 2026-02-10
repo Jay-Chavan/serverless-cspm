@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
-import json
+import random
 
 # Load environment variables
 load_dotenv()
@@ -14,7 +14,7 @@ app = Flask(__name__)
 CORS(app)
 
 # MongoDB connection
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb+srv://1032221163:WmG3kLX4WIv8GEJk@cluster0.4kypzkq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+MONGO_URI = os.getenv('MONGO_URI')
 DATABASE_NAME = os.getenv('DATABASE_NAME', 'csmp_findings')
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 's3_audit_findings')
 
@@ -29,16 +29,16 @@ except Exception as e:
     db = None
     collection = None
 
-class JSONEncoder(json.JSONEncoder):
-    """Custom JSON encoder to handle ObjectId and datetime objects"""
-    def default(self, obj):
-        if isinstance(obj, ObjectId):
-            return str(obj)
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        return super().default(obj)
+# Custom JSON serialization for MongoDB ObjectId and datetime
+def custom_json_serializer(obj):
+    """Custom JSON serializer for objects not serializable by default json code"""
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
 
-app.json_encoder = JSONEncoder
+app.json.default = custom_json_serializer
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -275,12 +275,11 @@ def get_findings_timeline():
 
 @app.route('/api/populate-sample-data', methods=['POST'])
 def populate_sample_data():
-    """Populate database with sample S3 security findings"""
+    """Populate database with sample AWS security findings"""
     if collection is None:
         return jsonify({"error": "Database not connected"}), 500
     
     try:
-        import random
         
         # Sample data generation
         aws_accounts = ['123456789012', '987654321098', '456789123456']
@@ -460,6 +459,26 @@ def populate_sample_data():
         
         findings.extend(additional_findings)
         
+        # --- Generate KMS Findings ---
+        for i in range(5):
+            findings.append({
+                "finding_id": f"kms-rot-{random.randint(10000, 99999)}",
+                "title": "KMS Key Rotation Not Enabled",
+                "description": "Automatic key rotation is not enabled for a customer managed key.",
+                "severity": random.choice(["Medium", "High"]),
+                "service": "KMS",
+                "resource_id": f"arn:aws:kms:us-east-1:123456789012:key/{random.randint(100000, 999999)}",
+                "resource_name": f"app-data-key-{random.randint(1, 10)}",
+                "account_id": random.choice(aws_accounts),
+                "region": random.choice(regions),
+                "status": random.choice(["Open", "In Progress", "Resolved"]),
+                "compliance_standards": ["CIS AWS Foundations"],
+                "risk_score": random.randint(50, 70),
+                "first_detected": (datetime.utcnow() - timedelta(days=random.randint(5, 30))).isoformat(),
+                "last_updated": datetime.utcnow().isoformat(),
+                "metadata": {"scan_type": "Key Management Audit", "scanner": "AWS Config"}
+            })
+        
         # Clear existing data and insert new findings
         collection.delete_many({})
         result = collection.insert_many(findings)
@@ -490,6 +509,38 @@ def populate_sample_data():
             }
         })
         
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- SIMULATION ENDPOINTS ---
+from simulation_service import simulation_service
+
+@app.route('/api/simulate/s3', methods=['POST'])
+def simulate_s3_vulnerability():
+    """Trigger creation of a vulnerable S3 bucket"""
+    try:
+        result = simulation_service.create_vulnerable_s3_bucket()
+        if result.get("success"):
+            return jsonify(result), 201
+        else:
+            return jsonify(result), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/simulate/cleanup', methods=['POST'])
+def cleanup_simulated_resource():
+    """Cleanup a specific simulated resource"""
+    try:
+        data = request.get_json()
+        resource_id = data.get('resource_id')
+        if not resource_id:
+            return jsonify({"error": "resource_id is required"}), 400
+            
+        result = simulation_service.cleanup_resource(resource_id)
+        if result.get("success"):
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

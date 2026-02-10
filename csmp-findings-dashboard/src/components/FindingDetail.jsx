@@ -109,7 +109,7 @@ const FindingDetail = () => {
 
   const getRecommendations = (finding) => {
     const recommendations = [];
-    
+
     if (finding?.service === 'S3') {
       if (finding?.title?.includes('public')) {
         recommendations.push({
@@ -131,7 +131,7 @@ const FindingDetail = () => {
         });
       }
     }
-    
+
     if (finding?.service === 'EC2') {
       recommendations.push({
         title: 'Review Security Groups',
@@ -144,7 +144,7 @@ const FindingDetail = () => {
         priority: 'Medium',
       });
     }
-    
+
     if (finding?.service === 'IAM') {
       recommendations.push({
         title: 'Apply Least Privilege',
@@ -157,7 +157,7 @@ const FindingDetail = () => {
         priority: 'High',
       });
     }
-    
+
     // Default recommendations if none specific
     if (recommendations.length === 0) {
       recommendations.push({
@@ -171,7 +171,7 @@ const FindingDetail = () => {
         priority: 'Low',
       });
     }
-    
+
     return recommendations;
   };
 
@@ -250,7 +250,7 @@ const FindingDetail = () => {
                   {finding.title}
                 </Typography>
               </Box>
-              
+
               <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
                 <Chip
                   label={finding.severity}
@@ -315,8 +315,8 @@ const FindingDetail = () => {
                   <Typography variant="h6" gutterBottom>
                     Additional Details
                   </Typography>
-                  <Box sx={{ backgroundColor: '#f5f5f5', p: 2, borderRadius: 1 }}>
-                    <pre style={{ margin: 0, fontSize: '0.875rem', whiteSpace: 'pre-wrap' }}>
+                  <Box sx={{ backgroundColor: 'rgba(172, 191, 164, 0.1)', p: 2, borderRadius: 2, border: '1px solid rgba(172, 191, 164, 0.2)' }}>
+                    <pre style={{ margin: 0, fontSize: '0.875rem', whiteSpace: 'pre-wrap', color: '#262626' }}>
                       {JSON.stringify(finding.details, null, 2)}
                     </pre>
                   </Box>
@@ -334,7 +334,7 @@ const FindingDetail = () => {
                 <AssignmentIcon />
                 Security Recommendations
               </Typography>
-              
+
               <List>
                 {recommendations.map((rec, index) => (
                   <ListItem key={index} sx={{ px: 0 }}>
