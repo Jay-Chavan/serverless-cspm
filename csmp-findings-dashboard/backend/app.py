@@ -512,37 +512,7 @@ def populate_sample_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# --- SIMULATION ENDPOINTS ---
-from simulation_service import simulation_service
 
-@app.route('/api/simulate/s3', methods=['POST'])
-def simulate_s3_vulnerability():
-    """Trigger creation of a vulnerable S3 bucket"""
-    try:
-        result = simulation_service.create_vulnerable_s3_bucket()
-        if result.get("success"):
-            return jsonify(result), 201
-        else:
-            return jsonify(result), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/simulate/cleanup', methods=['POST'])
-def cleanup_simulated_resource():
-    """Cleanup a specific simulated resource"""
-    try:
-        data = request.get_json()
-        resource_id = data.get('resource_id')
-        if not resource_id:
-            return jsonify({"error": "resource_id is required"}), 400
-            
-        result = simulation_service.cleanup_resource(resource_id)
-        if result.get("success"):
-            return jsonify(result), 200
-        else:
-            return jsonify(result), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

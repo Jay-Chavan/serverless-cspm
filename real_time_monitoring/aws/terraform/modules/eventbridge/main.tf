@@ -8,7 +8,15 @@ resource "aws_cloudwatch_event_rule" "s3_bucket_creation" {
     detail-type = ["AWS API Call via CloudTrail"]
     detail = {
       eventSource = ["s3.amazonaws.com"]
-      eventName   = ["CreateBucket"]
+      eventName   = [
+        "CreateBucket",
+        "PutBucketAcl",
+        "PutBucketPolicy",
+        "PutBucketPublicAccessBlock",
+        "DeleteBucketPublicAccessBlock",
+        "DeleteBucketPolicy",
+        "DeleteBucket"
+      ]
     }
   })
 

@@ -13,7 +13,7 @@ variable "s3_lambda_zip_path" {
 variable "runtime" {
   description = "Lambda runtime version"
   type        = string
-  default     = "python3.9"
+  default     = "python3.12"
 }
 
 variable "opa_server_ip" {

@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional
 
 # --- Configuration ---
 # Use environment variable for OPA server IP, fallback to public IP
-OPA_SERVER_IP = os.environ.get('OPA_SERVER_IP', '3.95.158.207')  # Replace with your EC2 public IP
+OPA_SERVER_IP = os.environ.get('OPA_SERVER_IP', '35.154.194.208')  # Updated with correct EC2 public IP
 OPA_PORT = os.environ.get('OPA_PORT', '8181')
 
 OPA_URL_SSE = f"http://{OPA_SERVER_IP}:{OPA_PORT}/v1/data/aws/s3_creation/deny"

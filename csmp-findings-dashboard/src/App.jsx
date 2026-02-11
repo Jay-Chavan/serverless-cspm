@@ -8,7 +8,6 @@ import Findings from './components/Findings';
 import Reports from './components/Reports';
 import FindingDetail from './components/FindingDetail';
 import CriticalIssues from './components/CriticalIssues';
-import Simulation from './components/Simulation';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 
@@ -81,7 +80,6 @@ function App() {
               <Route path="/reports" element={<Reports />} />
               <Route path="/resources" element={<Box sx={{ p: 3 }}><h3>Cloud Resources Inventory (Coming Soon)</h3></Box>} />
               <Route path="/finding/:id" element={<FindingDetail />} />
-              <Route path="/simulation-secret" element={<Simulation />} />
             </Routes>
           </Box>
         </Box>

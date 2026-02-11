@@ -1,7 +1,7 @@
-import boto3
-import requests
-from BucketACLS import audit_bucket_security, audit_bucket_acl
-from mongodb_client import store_finding_to_mongodb
+import boto3 # type: ignore
+import requests # type: ignore
+from BucketACLS import audit_bucket_security, audit_bucket_acl # type: ignore
+from mongodb_client import store_finding_to_mongodb, delete_findings_from_mongodb # type: ignore
 import json
 import os
 
@@ -41,10 +41,17 @@ def lambda_handler(event, context):
                     
                     print(f"SQS/EventBridge triggered audit for bucket: {bucket_name}")
                     print(f"Region: {region}, Account ID: {account_id}")
-                    print(f"CloudTrail event: {detail.get('eventName')}")
                     
-                    # Process the bucket audit for this record
-                    process_bucket_audit(bucket_name, region, account_id)
+                    event_name = detail.get('eventName')
+                    print(f"CloudTrail event: {event_name}")
+                    print(f"Full event details for debugging: {json.dumps(detail, default=str)}")
+                    
+                    if event_name == 'DeleteBucket':
+                        print(f"Processing DeleteBucket event for {bucket_name}")
+                        delete_findings_from_mongodb(bucket_name)
+                    else:
+                        # Process the bucket audit for this record
+                        process_bucket_audit(bucket_name, region, account_id)
                     
         elif event.get('event_source') == 'eventbridge':
             # Legacy EventBridge event structure (for backward compatibility)

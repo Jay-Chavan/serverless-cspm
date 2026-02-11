@@ -49,5 +49,19 @@ The project includes automation scripts for easy startup on Windows:
 - **Improved Startup Scripts**: Added `run.bat` and `start_project.ps1` for one-click environment startup.
 - **Sample Data Population**: Backend now includes an endpoint (`/api/populate-sample-data`) to seed the dashboard for testing.
 
+
+## 🕵️ Hidden Simulation Feature (Demo Mode)
+
+For demonstration purposes, the application includes a **hidden** workflow to simulate real-time vulnerabilities safely.
+
+- **Access**: Navigate manually to `http://localhost:5173/simulation-secret`
+- **Functionality**:
+    - Creates a real AWS S3 bucket with the prefix `cspm-demo-`.
+    - Applies a public bucket policy to trigger security alerts.
+- **Safety Measures**:
+    - **Restricted Prefix**: Backend only interacts with buckets starting with `cspm-demo-`.
+    - **Auto-Cleanup**: Resources are automatically deleted after 15 minutes.
+    - **Least Privilege**: Requires a dedicated IAM user with limited permissions (see `implementation_plan.md`).
+
 ---
 *For component-specific details, see the READMEs in the respective subdirectories.*
