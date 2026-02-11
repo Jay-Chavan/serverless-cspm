@@ -1,5 +1,5 @@
 import boto3
-import sys
+
 
 def check_opa_instance():
     ec2 = boto3.client('ec2', region_name='ap-south-1')
